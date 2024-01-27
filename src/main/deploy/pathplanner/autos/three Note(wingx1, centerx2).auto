@@ -1,0 +1,91 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.33,
+      "y": 6.956236908194216
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "NoteShoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Second Note(left)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "center left one from wing left_in"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "center left one from wing left_shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "NoteShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "center left two from center left one_in"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "centr left two from center left one_shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Note shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
