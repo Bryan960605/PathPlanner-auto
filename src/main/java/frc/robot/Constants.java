@@ -67,6 +67,11 @@ public final class Constants {
     public static final double rightFrontOffset = -0.355;
     public static final double leftRearOffset = -0.345;
     public static final double rightRearOffset = 0.042;
+
+    /**
+     * Drive base radius (distance from center to furthest module) 
+     * Unit:meters */ 
+    public static final double kDriveBaseRadius = 14.85 * 0.0254;
     
     public static double joysickValue(double value, double mineOutput){
       if(Math.abs(value) < mineOutput) return 0;

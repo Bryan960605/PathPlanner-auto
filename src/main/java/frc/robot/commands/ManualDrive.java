@@ -4,25 +4,37 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
-import static frc.robot.RobotContainer.*;
 
-import frc.robot.Constants;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class ManualDrive extends Command {
   /** Creates a new ManualDrive. */
-  private final SwerveSubsystem swerveSubsystem;
+  private final SwerveSubsystem m_swerveSubsystem;
   private double xSpeed;
   private double ySpeed;
   private double zSpeed;
-
-  private SlewRateLimiter xLimiter = new SlewRateLimiter(4);
-  private SlewRateLimiter yLimiter = new SlewRateLimiter(4);
-  private double deadBand = 0.1;
-  public ManualDrive(SwerveSubsystem _swerveSubsystem) {
-    this.swerveSubsystem = _swerveSubsystem;
+  private final DoubleSupplier xFunc;
+  private final DoubleSupplier yFunc;
+  private final DoubleSupplier zFunc;
+  private final BooleanSupplier slowbtn;
+  private final SlewRateLimiter xLimiter;
+  private final SlewRateLimiter yLimiter;
+  private final SlewRateLimiter zLimiter;
+  public ManualDrive(SwerveSubsystem swerveSubsystem, DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier zSpeed, BooleanSupplier slowbtn) {
+    this.m_swerveSubsystem = swerveSubsystem;
+    this.xFunc = xSpeed;
+    this.yFunc = ySpeed;
+    this.zFunc = zSpeed;
+    this.slowbtn = slowbtn;
+    xLimiter = new SlewRateLimiter(4);
+    yLimiter = new SlewRateLimiter(4);
+    zLimiter = new SlewRateLimiter(4);
     addRequirements(swerveSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -34,17 +46,28 @@ public class ManualDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(baseJoystick.getRawButton(6) == true){
-      xSpeed = xLimiter.calculate(-Constants.SwerveConstants.joysickValue(baseJoystick.getRawAxis(1), deadBand))*0.6;
-      ySpeed = yLimiter.calculate(-Constants.SwerveConstants.joysickValue(baseJoystick.getRawAxis(0), deadBand))*0.6;
-      zSpeed = -Constants.SwerveConstants.joysickValue(baseJoystick.getRawAxis(2), deadBand)*0.8;
+    xSpeed = xFunc.getAsDouble();
+    ySpeed = yFunc.getAsDouble();
+    zSpeed = zFunc.getAsDouble();
+
+    xSpeed = MathUtil.applyDeadband(xSpeed, 0.1);
+    ySpeed = MathUtil.applyDeadband(ySpeed, 0.1);
+    zSpeed = MathUtil.applyDeadband(zSpeed, 0.1);
+
+    if(slowbtn.getAsBoolean()){
+      xSpeed = xSpeed*0.4;
+      ySpeed = ySpeed*0.4;
+      zSpeed = zSpeed*0.4;
+    }else{
+      xSpeed = xSpeed*0.9;
+      ySpeed = ySpeed*0.9;
+      zSpeed = zSpeed*0.9;
     }
-    else{
-      xSpeed = xLimiter.calculate(-Constants.SwerveConstants.joysickValue(baseJoystick.getRawAxis(1), deadBand))*0.4;
-      ySpeed = yLimiter.calculate(-Constants.SwerveConstants.joysickValue(baseJoystick.getRawAxis(0), deadBand))*0.4;
-      zSpeed = -Constants.SwerveConstants.joysickValue(baseJoystick.getRawAxis(2), deadBand)*0.8;
-    }
-    swerveSubsystem.drive(xSpeed, ySpeed, zSpeed, true);
+
+    xSpeed = xLimiter.calculate(xSpeed);
+    ySpeed = yLimiter.calculate(ySpeed);
+    zSpeed = zLimiter.calculate(zSpeed);
+    m_swerveSubsystem.drive(xSpeed, ySpeed, zSpeed, true);
   }
 
   // Called once the command ends or is interrupted.
